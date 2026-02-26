@@ -70,20 +70,20 @@ For every task:
 ---
 
 ### Task 3: Pydantic Schemas
-- [ ] Create `app/models/schemas.py`
-- [ ] Implement `Location` model with `lat: float` and `lng: float`
+- [x] Create `app/models/schemas.py`
+- [x] Implement `Location` model with `lat: float` and `lng: float`
   - Add validator: lat must be between -90 and 90
   - Add validator: lng must be between -180 and 180
-- [ ] Implement `Stop` model with all fields from ARCHITECTURE.md
+- [x] Implement `Stop` model with all fields from ARCHITECTURE.md
   - Add validator: `earliest_pickup` < `latest_pickup`
   - Add validator: time format is `HH:MM`
   - Add validator: `service_time_minutes` between 1 and 60
-- [ ] Implement `OptimizeRouteRequest` model
+- [x] Implement `OptimizeRouteRequest` model
   - Add validator: stops list has between 2 and 25 items
   - Add validator: `departure_time` is not in the past
-- [ ] Implement `OptimizedStop` model
-- [ ] Implement `OptimizeRouteResponse` model
-- [ ] Write `tests/test_schemas.py` with tests for:
+- [x] Implement `OptimizedStop` model
+- [x] Implement `OptimizeRouteResponse` model
+- [x] Write `tests/test_schemas.py` with tests for:
   - Valid request passes validation
   - Invalid coordinates rejected
   - Too many stops rejected

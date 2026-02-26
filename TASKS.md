@@ -287,7 +287,7 @@ For every task:
 ---
 
 ### Task 12: README.md
-- [ ] Create `README.md` with:
+- [x] Create `README.md` with:
   - Project description (one paragraph)
   - Prerequisites (Python 3.11+, Docker, Google Maps API key)
   - Setup instructions (clone, copy .env.example, add API key, run)

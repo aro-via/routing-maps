@@ -202,17 +202,30 @@ with patch("app.optimizer.distance_matrix.redis.Redis") as mock_redis:
 **Remote Repository:** `https://github.com/aro-via/routing-maps.git`
 
 When completing tasks from TASKS.md:
-1. Create new branch named `feature/<task-number>-<brief-description>` before starting work
-2. Make atomic commits with conventional commit messages:
-    - feat: for new features
-    - fix: for bug fixes
-    - docs: for documentation
-    - test: for tests
-    - refactor: for refactoring
-3. Push the feature branch to remote: `git push -u origin feature/<task-number>-<brief-description>`
-4. **Create a Pull Request** using `gh pr create` — never merge directly to main:
+1. Always start from the latest remote `main`:
+    ```bash
+    git fetch origin
+    git checkout main
+    git pull origin main
+    ```
+2. Create a new branch from `main` named `feature/<task-number>-<brief-description>`:
+    ```bash
+    git checkout -b feature/<task-number>-<brief-description>
+    ```
+3. Implement changes and make atomic commits with conventional commit messages:
+    - `feat:` for new features
+    - `fix:` for bug fixes
+    - `docs:` for documentation
+    - `test:` for tests
+    - `refactor:` for refactoring
+4. Push the feature branch to remote:
+    ```bash
+    git push -u origin feature/<task-number>-<brief-description>
+    ```
+5. **Create a Pull Request** using `gh pr create` targeting `main`:
     - Descriptive title matching the task
     - Summary of changes made
     - Testing notes and test results
-5. Update the task checkbox in TASKS.md to mark it complete
-6. **Do NOT push directly to `main`** — all changes go through PRs
+6. Update the task checkbox in TASKS.md to mark it complete
+7. **Do NOT merge the PR** — the user will manually merge it via github.com
+8. **Do NOT push directly to `main`** — all changes go through PRs only

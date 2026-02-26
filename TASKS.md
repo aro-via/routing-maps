@@ -17,11 +17,24 @@ git remote add origin https://github.com/aro-via/routing-maps.git
 ## Git Workflow Per Task
 
 For every task:
-1. `git checkout -b feature/<task-number>-<description>`
-2. Implement + commit changes
-3. `git push -u origin feature/<task-number>-<description>`
-4. `gh pr create` — **always create a PR, never push directly to main**
-5. Check off task boxes in this file
+1. Sync with remote `main` first:
+    ```bash
+    git fetch origin
+    git checkout main
+    git pull origin main
+    ```
+2. Create a new branch from `main`:
+    ```bash
+    git checkout -b feature/<task-number>-<description>
+    ```
+3. Implement changes and commit
+4. Push the branch to remote:
+    ```bash
+    git push -u origin feature/<task-number>-<description>
+    ```
+5. `gh pr create` targeting `main` — **always create a PR, never push directly to main**
+6. Check off task boxes in this file
+7. **Do NOT merge the PR** — the user merges manually via github.com
 
 ---
 

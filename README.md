@@ -17,8 +17,8 @@ A HIPAA-compliant Route Optimization API for Non-Emergency Medical Transportatio
 
 ```bash
 # 1. Clone the repository
-git clone <repo-url>
-cd route-optimizer
+git clone https://github.com/aro-via/routing-maps.git
+cd routing-maps
 
 # 2. Copy environment file and fill in your API key
 cp .env.example .env
@@ -81,7 +81,7 @@ Content-Type: application/json
 {
   "driver_id": "driver-001",
   "driver_location": { "lat": 40.7128, "lng": -74.0060 },
-  "departure_time": "2024-01-15T08:00:00Z",
+  "departure_time": "2030-06-15T08:00:00Z",
   "stops": [
     {
       "stop_id": "550e8400-e29b-41d4-a716-446655440001",

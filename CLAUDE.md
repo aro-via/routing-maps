@@ -199,6 +199,8 @@ with patch("app.optimizer.distance_matrix.redis.Redis") as mock_redis:
 
 ## Git Workflow
 
+**Remote Repository:** `https://github.com/aro-via/routing-maps.git`
+
 When completing tasks from TASKS.md:
 - Create new branch named `feature/<task-number>-<brief-description>` before starting work
 - Make atomic commits with conventional commit messages:
@@ -207,6 +209,7 @@ When completing tasks from TASKS.md:
     - docs: for documentation
     - test: for tests
     - refactor: for refactoring
+- Push branch to remote: `git push -u origin feature/<task-number>-<brief-description>`
 - After completing a task, create a pull request with:
     - A descriptive title matching the task
     - A summary of changes made

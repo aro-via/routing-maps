@@ -4,6 +4,17 @@ Work through tasks in order. Do not skip ahead. Complete and validate each phase
 
 ---
 
+## Repository
+
+**Remote:** `https://github.com/aro-via/routing-maps.git`
+
+```bash
+git remote add origin https://github.com/aro-via/routing-maps.git
+git push -u origin <branch-name>
+```
+
+---
+
 ## How to Use This File
 
 1. Start Claude Code in the project directory: `claude`

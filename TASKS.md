@@ -95,16 +95,16 @@ For every task:
 ---
 
 ### Task 4: FastAPI App Entry Point
-- [ ] Create `app/main.py` with FastAPI app instance
-- [ ] Configure logging into database table based on `settings.LOG_LEVEL`
-- [ ] Include router from `app/api/routes.py`
-- [ ] Add startup event that logs app is ready
-- [ ] Create `app/api/routes.py` with placeholder endpoints:
+- [x] Create `app/main.py` with FastAPI app instance
+- [x] Configure logging into database table based on `settings.LOG_LEVEL`
+- [x] Include router from `app/api/routes.py`
+- [x] Add startup event that logs app is ready
+- [x] Create `app/api/routes.py` with placeholder endpoints:
   - `POST /api/v1/optimize-route` → returns `{"status": "not implemented"}` for now
   - `GET /api/v1/health` → returns `{"status": "healthy"}`
-- [ ] Confirm app starts: `uvicorn app.main:app --reload`
-- [ ] Confirm `/docs` Swagger UI loads in browser
-- [ ] Confirm `GET /api/v1/health` returns 200
+- [x] Confirm app starts: `uvicorn app.main:app --reload`
+- [x] Confirm `/docs` Swagger UI loads in browser
+- [x] Confirm `GET /api/v1/health` returns 200
 
 **Validation:** App starts without errors. `/docs` loads. `/api/v1/health` returns 200.
 

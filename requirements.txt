@@ -1,0 +1,27 @@
+# Core API
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+
+# Google Maps
+googlemaps==4.10.0
+
+# OR-Tools (VRP Solver)
+ortools==9.11.4210
+
+# Redis
+redis==5.2.1
+fakeredis==2.26.2
+
+# Phase 2 — Celery
+celery==5.4.0
+flower==2.0.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.2
+httpx==0.28.1
+
+# Utilities
+python-dotenv==1.0.1

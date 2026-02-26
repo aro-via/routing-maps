@@ -249,15 +249,15 @@ For every task:
 ---
 
 ### Task 10: End-to-End Test
-- [ ] Create `tests/test_e2e.py` with a realistic scenario:
+- [x] Create `tests/test_e2e.py` with a realistic scenario:
   - 5 stops with varying time windows
   - Assert optimized route is different from input order
   - Assert all time windows are respected
   - Assert total duration is less than naive (input order) duration
   - Assert Google Maps URL is valid format
   - Assert no stop_id or PHI appears in the maps URL
-- [ ] Run full test suite: `pytest tests/ -v`
-- [ ] Fix any failures
+- [x] Run full test suite: `pytest tests/ -v`
+- [x] Fix any failures
 
 **Validation:** `pytest tests/ -v` — ALL tests pass. Zero failures.
 

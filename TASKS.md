@@ -126,15 +126,15 @@ For every task:
 ## Phase 2 — Core Optimizer
 
 ### Task 5: Time Utilities
-- [ ] Create `app/utils/time_utils.py`
-- [ ] Implement `time_str_to_minutes(time_str: str) -> int`
+- [x] Create `app/utils/time_utils.py`
+- [x] Implement `time_str_to_minutes(time_str: str) -> int`
   - Input: `"08:30"` → Output: `510`
-- [ ] Implement `minutes_to_time_str(minutes: int) -> str`
+- [x] Implement `minutes_to_time_str(minutes: int) -> str`
   - Input: `510` → Output: `"08:30"`
-- [ ] Implement `add_minutes_to_time(time_str: str, minutes: int) -> str`
+- [x] Implement `add_minutes_to_time(time_str: str, minutes: int) -> str`
   - Input: `"08:30"`, `45` → Output: `"09:15"`
   - Handle day overflow (should not happen in practice but handle gracefully)
-- [ ] Write `tests/test_time_utils.py` with edge cases:
+- [x] Write `tests/test_time_utils.py` with edge cases:
   - Midnight (0 minutes → `"00:00"`)
   - End of day (1439 minutes → `"23:59"`)
   - Overflow protection
@@ -144,11 +144,11 @@ For every task:
 ---
 
 ### Task 6: Distance Matrix Module
-- [ ] Create `app/optimizer/distance_matrix.py`
-- [ ] Implement Redis connection using settings
-- [ ] Implement `_build_cache_key(locations, departure_time) -> str`
+- [x] Create `app/optimizer/distance_matrix.py`
+- [x] Implement Redis connection using settings
+- [x] Implement `_build_cache_key(locations, departure_time) -> str`
   - Use MD5 of sorted coordinates + departure hour
-- [ ] Implement `build_distance_matrix(locations, departure_time) -> dict`
+- [x] Implement `build_distance_matrix(locations, departure_time) -> dict`
   - Check Redis cache first
   - On miss: call `googlemaps.distance_matrix()` with:
     - `mode="driving"`
@@ -160,7 +160,7 @@ For every task:
   - Handle `element['status'] != 'OK'` gracefully (set to 999999)
   - Cache result in Redis with TTL
   - Return `{"time_matrix": [...], "distance_matrix": [...]}`
-- [ ] Write `tests/test_distance_matrix.py` using mocked Google client:
+- [x] Write `tests/test_distance_matrix.py` using mocked Google client:
   - Test cache hit returns cached value
   - Test cache miss calls Google API
   - Test response parsing extracts `duration_in_traffic` correctly
@@ -171,14 +171,14 @@ For every task:
 ---
 
 ### Task 7: VRP Solver (OR-Tools)
-- [ ] Create `app/optimizer/vrp_solver.py`
-- [ ] Implement `solve_vrp(time_matrix, stops, service_times, num_vehicles=1) -> List[int]`
+- [x] Create `app/optimizer/vrp_solver.py`
+- [x] Implement `solve_vrp(time_matrix, stops, service_times, num_vehicles=1) -> List[int]`
   - Set up `RoutingIndexManager` with depot at index 0
   - Register transit callback (travel time + service time)
   - Set arc cost evaluator
   - Add `Time` dimension with:
     - slack_max = 30 minutes
-    - capacity = 600 minutes
+    - capacity = 1440 minutes (full day, absolute time-of-day values)
     - fix_start_cumul_to_zero = False
   - Apply time window constraints for each stop
   - Set search parameters:
@@ -188,7 +188,7 @@ For every task:
   - Solve and extract ordered route
   - Raise clear exception if no solution found
   - Return list of stop indices in optimal order (0-based, depot excluded)
-- [ ] Write `tests/test_vrp_solver.py`:
+- [x] Write `tests/test_vrp_solver.py`:
   - Test 3-stop problem with known optimal solution
   - Test that time windows are respected in output
   - Test raises exception when windows are impossible
@@ -200,8 +200,8 @@ For every task:
 ---
 
 ### Task 8: Route Builder
-- [ ] Create `app/optimizer/route_builder.py`
-- [ ] Implement `build_final_route(driver_location, ordered_stops, time_matrix, departure_time) -> dict`
+- [x] Create `app/optimizer/route_builder.py`
+- [x] Implement `build_final_route(driver_location, ordered_stops, time_matrix, departure_time) -> dict`
   - Calculate cumulative arrival time at each stop
   - Calculate departure time (arrival + service_time_minutes)
   - Build list of `OptimizedStop` objects with sequence numbers
@@ -209,10 +209,10 @@ For every task:
   - Calculate total distance from distance_matrix
   - Calculate total duration in minutes
   - Return full result dict
-- [ ] Implement `_build_maps_url(origin, stops) -> str`
+- [x] Implement `_build_maps_url(origin, stops) -> str`
   - Format: `https://www.google.com/maps/dir/lat,lng/lat,lng/...`
   - Coordinates only — never include names or IDs
-- [ ] Write `tests/test_route_builder.py`:
+- [x] Write `tests/test_route_builder.py`:
   - Test arrival times calculated correctly
   - Test departure times include service time
   - Test Google Maps URL format is correct
@@ -226,17 +226,17 @@ For every task:
 ## Phase 3 — API Integration
 
 ### Task 9: Wire Up the Full Pipeline
-- [ ] Update `app/api/routes.py` to implement the full `/api/v1/optimize-route` endpoint:
+- [x] Update `app/api/routes.py` to implement the full `/api/v1/optimize-route` endpoint:
   - Call `build_distance_matrix()`
   - Call `solve_vrp()`
   - Call `build_final_route()`
   - Return `OptimizeRouteResponse`
-- [ ] Add proper error handling for each step (see ARCHITECTURE.md Section 6)
-- [ ] Update `/api/v1/health` to check:
+- [x] Add proper error handling for each step (see ARCHITECTURE.md Section 6)
+- [x] Update `/api/v1/health` to check:
   - Redis connectivity (ping)
   - Google Maps API key presence (not validity — don't make API calls on health check)
   - Return `{"status": "healthy", "redis": "ok", "maps_api": "configured"}`
-- [ ] Write `tests/test_api.py` using FastAPI `TestClient`:
+- [x] Write `tests/test_api.py` using FastAPI `TestClient`:
   - Test valid request returns 200 with correct response shape
   - Test invalid coordinates return 422
   - Test too many stops returns 422

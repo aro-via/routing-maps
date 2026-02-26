@@ -1,3 +1,5 @@
+# Python 3.12 required (ortools does not yet support 3.13+)
+
 # Core API
 fastapi==0.115.6
 uvicorn[standard]==0.34.0

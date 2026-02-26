@@ -10,8 +10,18 @@ Work through tasks in order. Do not skip ahead. Complete and validate each phase
 
 ```bash
 git remote add origin https://github.com/aro-via/routing-maps.git
-git push -u origin <branch-name>
 ```
+
+---
+
+## Git Workflow Per Task
+
+For every task:
+1. `git checkout -b feature/<task-number>-<description>`
+2. Implement + commit changes
+3. `git push -u origin feature/<task-number>-<description>`
+4. `gh pr create` — **always create a PR, never push directly to main**
+5. Check off task boxes in this file
 
 ---
 

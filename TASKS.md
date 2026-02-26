@@ -266,7 +266,7 @@ For every task:
 ## Phase 4 — Docker & Deployment Prep
 
 ### Task 11: Dockerfile
-- [ ] Create `Dockerfile`:
+- [x] Create `Dockerfile`:
   - Base image: `python:3.11-slim`
   - Create non-root user (`appuser`) — HIPAA / security requirement
   - Copy and install requirements
@@ -274,7 +274,7 @@ For every task:
   - Expose port 8000
   - Run as non-root user
   - CMD: `uvicorn app.main:app --host 0.0.0.0 --port 8000`
-- [ ] Create `docker-compose.yml`:
+- [x] Create `docker-compose.yml`:
   - `api` service (build from Dockerfile)
   - `redis` service (redis:7-alpine)
   - Proper `depends_on` and `env_file`

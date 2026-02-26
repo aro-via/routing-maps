@@ -41,9 +41,9 @@ git push -u origin <branch-name>
 ---
 
 ### Task 2: Configuration & Settings
-- [ ] Create `app/config.py` using `pydantic-settings`
-- [ ] Load all settings from environment variables (no hardcoded values)
-- [ ] Settings to include:
+- [x] Create `app/config.py` using `pydantic-settings`
+- [x] Load all settings from environment variables (no hardcoded values)
+- [x] Settings to include:
   - `GOOGLE_MAPS_API_KEY: str`
   - `REDIS_HOST: str = "localhost"`
   - `REDIS_PORT: int = 6379`
@@ -52,8 +52,8 @@ git push -u origin <branch-name>
   - `MAX_STOPS_PER_ROUTE: int = 25`
   - `ENV: str = "development"`
   - `LOG_LEVEL: str = "INFO"`
-- [ ] Settings class uses `model_config = SettingsConfigDict(env_file=".env")`
-- [ ] Export a single `settings` singleton instance
+- [x] Settings class uses `model_config = SettingsConfigDict(env_file=".env")`
+- [x] Export a single `settings` singleton instance
 
 **Validation:** Write a quick test that loads settings and confirms `MAX_STOPS_PER_ROUTE == 25`.
 

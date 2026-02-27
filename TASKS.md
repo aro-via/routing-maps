@@ -534,19 +534,19 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 25: GPS Service & WebSocket Client
-- [ ] Create `driver-app/src/services/gps.ts`
+- [x] Create `driver-app/src/services/gps.ts`
   - Start/stop background GPS tracking
   - Adaptive update intervals (see `ARCHITECTURE.md` Section 10.7)
   - Callback fires with `{ lat, lng, timestamp, speed }`
-- [ ] Create `driver-app/src/services/websocket.ts`
+- [x] Create `driver-app/src/services/websocket.ts`
   - Connect to `ws://{SERVER_URL}/ws/driver/{driver_id}`
   - Send GPS update on each location callback
   - Listen for incoming `route_updated` messages
   - Auto-reconnect on disconnect (exponential backoff, max 5 retries)
   - Handle `ping` messages (respond with `pong`)
-- [ ] Write unit tests for reconnect logic and message parsing
+- [x] Write unit tests for reconnect logic and message parsing
 
-**Validation:** GPS service fires callbacks. WebSocket connects to local server and sends/receives messages.
+**Validation:** Unit tests cover adaptive intervals, reconnect backoff, message parsing, and send logic.
 
 ---
 

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+ios/build/
+android/build/
+android/.gradle/
+android/app/build/
+
+# iOS CocoaPods
+ios/Pods/
+ios/Podfile.lock
+
+# Firebase credentials — NEVER commit these
+ios/GoogleService-Info.plist
+android/app/google-services.json
+
+# Env files
+.env
+.env.local
+
+# Metro bundler cache
+.metro-cache/
+
+# TypeScript build output
+dist/
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+.vscode/

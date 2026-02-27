@@ -1,0 +1,51 @@
+{
+  "name": "DriverApp",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-native": "0.76.5",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/native-stack": "^6.11.0",
+    "react-native-screens": "^3.35.0",
+    "react-native-safe-area-context": "^4.14.0",
+    "react-native-maps": "^1.20.1",
+    "react-native-background-geolocation": "^4.16.0",
+    "@react-native-firebase/app": "^21.6.0",
+    "@react-native-firebase/messaging": "^21.6.0",
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
+    "@react-native/babel-preset": "0.76.5",
+    "@react-native/eslint-config": "0.76.5",
+    "@react-native/metro-config": "0.76.5",
+    "@react-native/typescript-config": "0.76.5",
+    "@types/jest": "^29.5.13",
+    "@types/react": "^18.3.1",
+    "@types/react-native-background-geolocation": "^4.0.1",
+    "eslint": "^8.19.0",
+    "jest": "^29.7.0",
+    "prettier": "2.8.8",
+    "ts-jest": "^29.2.5",
+    "typescript": "5.0.4"
+  },
+  "jest": {
+    "preset": "react-native",
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "testPathPattern": "src/__tests__"
+  }
+}

@@ -63,11 +63,11 @@ def _patch_optimizer(stop_indices=None):
         stop_indices = [1, 0]   # solver reorders: s2 first, s1 second
 
     dm_patch = patch(
-        "app.api.routes.build_distance_matrix",
+        "app.optimizer.pipeline.build_distance_matrix",
         return_value=MOCK_MATRICES,
     )
     vrp_patch = patch(
-        "app.api.routes.solve_vrp",
+        "app.optimizer.pipeline.solve_vrp",
         return_value=stop_indices,
     )
     return dm_patch, vrp_patch
@@ -198,14 +198,14 @@ def test_invalid_time_window_returns_422():
 # ---------------------------------------------------------------------------
 
 def test_google_api_failure_returns_503():
-    with patch("app.api.routes.build_distance_matrix", side_effect=Exception("API down")):
+    with patch("app.optimizer.pipeline.build_distance_matrix", side_effect=Exception("API down")):
         resp = client.post("/api/v1/optimize-route", json=VALID_REQUEST)
     assert resp.status_code == 503
 
 
 def test_vrp_no_solution_returns_422():
-    with patch("app.api.routes.build_distance_matrix", return_value=MOCK_MATRICES), \
-         patch("app.api.routes.solve_vrp", side_effect=ValueError("No feasible route")):
+    with patch("app.optimizer.pipeline.build_distance_matrix", return_value=MOCK_MATRICES), \
+         patch("app.optimizer.pipeline.solve_vrp", side_effect=ValueError("No feasible route")):
         resp = client.post("/api/v1/optimize-route", json=VALID_REQUEST)
     assert resp.status_code == 422
     assert "No feasible route" in resp.json()["detail"]

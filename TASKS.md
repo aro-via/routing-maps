@@ -360,14 +360,14 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ## Phase 6 — Backend Re-Routing Infrastructure
 
 ### Task 16: Extract Optimizer Pipeline
-- [ ] Create `app/optimizer/pipeline.py`
-- [ ] Move the core optimization logic out of the HTTP endpoint into a standalone async function:
+- [x] Create `app/optimizer/pipeline.py`
+- [x] Move the core optimization logic out of the HTTP endpoint into a standalone async function:
   ```python
   async def run_optimization(driver_location, stops, departure_time) -> OptimizeRouteResponse
   ```
-- [ ] Update `app/api/routes.py` POST endpoint to call `run_optimization()` — no logic change, just delegation
-- [ ] Confirm all Phase 1 tests still pass after refactor: `pytest tests/ -v`
-- [ ] This function will be called identically from both the HTTP handler and the Celery worker
+- [x] Update `app/api/routes.py` POST endpoint to call `run_optimization()` — no logic change, just delegation
+- [x] Confirm all Phase 1 tests still pass after refactor: `pytest tests/ -v`
+- [x] This function will be called identically from both the HTTP handler and the Celery worker
 
 **Validation:** `pytest tests/ -v` — zero regressions. Function is importable from `app.optimizer.pipeline`.
 

@@ -396,17 +396,17 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 18: Celery Setup
-- [ ] Add to `requirements.txt`: `celery==5.3+`, `flower==2.0+`
-- [ ] Create `app/workers/celery_app.py`:
+- [x] Add to `requirements.txt`: `celery==5.3+`, `flower==2.0+`
+- [x] Create `app/workers/celery_app.py`:
   - Celery instance using Redis as broker (`CELERY_BROKER_URL`)
   - Redis as result backend (`CELERY_RESULT_BACKEND`)
   - Configure serializer as JSON
   - Set task time limits (soft: 15s, hard: 30s)
-- [ ] Add new environment variables to `.env.example`:
+- [x] Add new environment variables to `.env.example`:
   - `CELERY_BROKER_URL=redis://localhost:6379/1`
   - `CELERY_RESULT_BACKEND=redis://localhost:6379/2`
-- [ ] Confirm Celery worker starts: `celery -A app.workers.celery_app worker --loglevel=info`
-- [ ] Confirm Flower dashboard starts: `celery -A app.workers.celery_app flower`
+- [x] Confirm Celery worker starts: `celery -A app.workers.celery_app worker --loglevel=info`
+- [x] Confirm Flower dashboard starts: `celery -A app.workers.celery_app flower`
 
 **Validation:** Flower UI visible at `http://localhost:5555`. Worker shows as online.
 

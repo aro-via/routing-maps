@@ -47,6 +47,23 @@ services:
       - ./app:/app/app
     command: celery -A app.workers.celery_app worker --loglevel=info
 
+  celery-beat:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+    command: celery -A app.workers.celery_app beat --loglevel=info
+
   flower:
     build: .
     restart: unless-stopped

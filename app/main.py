@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from app.config import configure_logging, settings
 from app.api.routes import router
+from app.websocket.handlers import ws_router
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -30,3 +31,4 @@ app = FastAPI(
 )
 
 app.include_router(router)
+app.include_router(ws_router)

@@ -374,18 +374,18 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 17: Active Driver State (Redis)
-- [ ] Create `app/state/driver_state.py`
-- [ ] Implement `DriverState` dataclass with fields:
+- [x] Create `app/state/driver_state.py`
+- [x] Implement `DriverState` dataclass with fields:
   - `driver_id`, `current_route`, `last_gps`, `completed_stop_ids`
   - `original_remaining_duration`, `schedule_delay_minutes`
   - `last_reroute_timestamp`, `stops_changed`, `status`
-- [ ] Implement `save_driver_state(state: DriverState)` — serialize to Redis with 12-hour TTL
-- [ ] Implement `get_driver_state(driver_id: str) -> DriverState | None`
-- [ ] Implement `update_driver_gps(driver_id, lat, lng, timestamp)`
-- [ ] Implement `mark_stop_completed(driver_id, stop_id)`
-- [ ] Implement `clear_driver_state(driver_id)` — called at end of shift
-- [ ] Confirm no PHI stored — only stop IDs (UUIDs) and coordinates
-- [ ] Write `tests/test_driver_state.py`:
+- [x] Implement `save_driver_state(state: DriverState)` — serialize to Redis with 12-hour TTL
+- [x] Implement `get_driver_state(driver_id: str) -> DriverState | None`
+- [x] Implement `update_driver_gps(driver_id, lat, lng, timestamp)`
+- [x] Implement `mark_stop_completed(driver_id, stop_id)`
+- [x] Implement `clear_driver_state(driver_id)` — called at end of shift
+- [x] Confirm no PHI stored — only stop IDs (UUIDs) and coordinates
+- [x] Write `tests/test_driver_state.py`:
   - Test save and retrieve round-trip
   - Test GPS update modifies only last_gps
   - Test completed stops accumulate correctly

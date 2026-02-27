@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Log startup and shutdown events."""
     logger.info(
         "Route Optimizer starting up — ENV=%s LOG_LEVEL=%s",
         settings.ENV,

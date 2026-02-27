@@ -304,35 +304,35 @@ For every task:
 ## Phase 5 — Final Review
 
 ### Task 13: Code Quality Pass
-- [ ] Run through every file and confirm:
+- [x] Run through every file and confirm:
   - No hardcoded API keys or secrets
   - No PHI or patient names in any variable, log message, or comment
   - Every public function has a docstring
   - All imports are used
   - No `print()` statements (use `logger` instead)
   - No bare `except:` clauses
-- [ ] Confirm `pytest tests/ -v` still passes after cleanup
+- [x] Confirm `pytest tests/ -v` still passes after cleanup
 
 ---
 
 ### Task 14: HIPAA Final Check
-- [ ] Search entire codebase for any of these strings (should find ZERO occurrences in actual data):
+- [x] Search entire codebase for any of these strings (should find ZERO occurrences in actual data):
   - `patient_name`
   - `first_name` / `last_name`
   - `dob` / `date_of_birth`
   - Any hardcoded personal data
-- [ ] Confirm Google Maps URL in response contains ONLY coordinates
-- [ ] Confirm Redis cache keys contain ONLY hashes (no readable location names)
-- [ ] Confirm no PHI appears in log output
+- [x] Confirm Google Maps URL in response contains ONLY coordinates
+- [x] Confirm Redis cache keys contain ONLY hashes (no readable location names)
+- [x] Confirm no PHI appears in log output
 
 ---
 
 ### Task 15: Smoke Test in Docker
-- [ ] Start full stack: `docker-compose up --build`
-- [ ] Send a test request with 4–5 mock stops
-- [ ] Confirm response includes reordered stops, ETAs, and Maps URL
-- [ ] Confirm Maps URL opens correctly in a browser
-- [ ] Run `docker-compose down`
+- [x] Start full stack: `docker-compose up --build`
+- [x] Send a test request with 4–5 mock stops
+- [x] Confirm response includes reordered stops, ETAs, and Maps URL
+- [x] Confirm Maps URL opens correctly in a browser
+- [x] Run `docker-compose down`
 
 ---
 

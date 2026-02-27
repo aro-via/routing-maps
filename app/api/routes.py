@@ -33,6 +33,12 @@ def _compute_naive_duration(
 
 @router.post("/optimize-route", response_model=OptimizeRouteResponse)
 async def optimize_route(request: OptimizeRouteRequest) -> OptimizeRouteResponse:
+    """Optimise a multi-stop pickup route using VRPTW and real-time traffic data.
+
+    Calls Google Distance Matrix API (cached in Redis), runs OR-Tools VRPTW solver,
+    then assembles per-stop ETAs and a summary response.
+    Returns HTTP 503 if Google Maps is unavailable, 422 if no feasible route exists.
+    """
     logger.info("optimize-route: driver_id=%s stops=%d", request.driver_id, len(request.stops))
 
     # 1. Build coordinate list: index 0 = driver, 1..n = stops (input order)
@@ -111,6 +117,7 @@ async def optimize_route(request: OptimizeRouteRequest) -> OptimizeRouteResponse
 
 @router.get("/health")
 async def health_check() -> JSONResponse:
+    """Return service health: Redis connectivity and Maps API key presence."""
     # Redis connectivity
     redis_status = "unavailable"
     try:

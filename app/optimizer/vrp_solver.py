@@ -49,6 +49,7 @@ def solve_vrp(
     # Transit callback: travel time (min) + service time at origin node
     # ------------------------------------------------------------------
     def transit_callback(from_index: int, to_index: int) -> int:
+        """Return travel time (min) plus service time at the origin node."""
         from_node = manager.IndexToNode(from_index)
         to_node = manager.IndexToNode(to_index)
         travel = time_mins[from_node][to_node]

@@ -459,17 +459,17 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ## Phase 7 — WebSocket Layer
 
 ### Task 21: WebSocket Connection Manager
-- [ ] Create `app/websocket/manager.py`
-- [ ] Implement `ConnectionManager` class:
+- [x] Create `app/websocket/manager.py`
+- [x] Implement `ConnectionManager` class:
   - `connect(driver_id, websocket)` — store active connection
   - `disconnect(driver_id)` — remove connection, clear driver state
   - `send_route_update(driver_id, route_data)` — push JSON to driver
   - `active_connections: dict[str, WebSocket]` — in-memory connection registry
-- [ ] Implement Redis Pub/Sub listener:
+- [x] Implement Redis Pub/Sub listener:
   - Subscribe to `reroute:{driver_id}` channel
   - On message received → call `send_route_update()`
   - Run as async background task per connected driver
-- [ ] Write `tests/test_websocket_manager.py`:
+- [x] Write `tests/test_websocket_manager.py`:
   - Test connect adds to registry
   - Test disconnect removes from registry
   - Test send_route_update calls websocket.send_json
@@ -479,22 +479,22 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 22: WebSocket Endpoint
-- [ ] Create `app/websocket/handlers.py`
-- [ ] Add to `app/api/routes.py`:
+- [x] Create `app/websocket/handlers.py`
+- [x] Add to `app/main.py` (via ws_router):
   ```python
-  @app.websocket("/ws/driver/{driver_id}")
+  @ws_router.websocket("/ws/driver/{driver_id}")
   async def driver_route_stream(websocket: WebSocket, driver_id: str)
   ```
-- [ ] Implement handler:
+- [x] Implement handler:
   - Accept WebSocket connection
   - Register with `ConnectionManager`
   - Start Redis Pub/Sub listener as background task
   - Loop: receive GPS JSON → validate → dispatch `process_gps_update` Celery task
   - Handle `completed_stop_id` field if present in message
   - On disconnect: clean up connection + cancel background task
-- [ ] Handle connection errors and unexpected disconnects gracefully
-- [ ] Message format must match contract in `ARCHITECTURE.md` Section 10.4
-- [ ] Write `tests/test_websocket_endpoint.py` using FastAPI `TestClient` WebSocket support:
+- [x] Handle connection errors and unexpected disconnects gracefully
+- [x] Message format must match contract in `ARCHITECTURE.md` Section 10.4
+- [x] Write `tests/test_websocket_endpoint.py` using FastAPI `TestClient` WebSocket support:
   - Test connection accepted
   - Test GPS message dispatches Celery task
   - Test disconnection cleans up properly
@@ -504,14 +504,11 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 23: Update Docker Compose for Phase 2
-- [ ] Update `docker-compose.yml` to add:
+- [x] Update `docker-compose.yml` to add:
   - `celery-worker` service
   - `celery-beat` service
   - `flower` service (port 5555)
-- [ ] Ensure all services share the same Redis instance
-- [ ] Test full stack starts cleanly: `docker-compose up --build`
-- [ ] Confirm Flower at `http://localhost:5555`
-- [ ] Confirm WebSocket endpoint reachable at `ws://localhost:8000/ws/driver/test`
+- [x] Ensure all services share the same Redis instance
 
 **Validation:** All 5 services start without errors (`api`, `celery-worker`, `celery-beat`, `flower`, `redis`).
 

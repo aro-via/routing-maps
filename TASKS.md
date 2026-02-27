@@ -551,20 +551,22 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 26: Zustand Route Store
-- [ ] Create `driver-app/src/store/routeStore.ts`
-- [ ] State to manage:
+- [x] Create `driver-app/src/store/routeStore.ts`
+- [x] State to manage:
   - `currentRoute: OptimizedStop[]`
   - `currentStopIndex: number`
   - `driverStatus: 'idle' | 'active' | 'completed'`
   - `lastUpdated: string`
   - `routeUpdateReason: string | null`
-- [ ] Actions:
+- [x] Actions:
   - `setRoute(stops)` — set initial or updated route
   - `completeCurrentStop()` — advance to next stop
   - `resetRoute()` — end of shift cleanup
-- [ ] Route updates from WebSocket call `setRoute()` automatically
+  - `dismissUpdateBanner()` — clear routeUpdateReason
+- [x] Route updates from WebSocket call `setRoute()` automatically
+- [x] Selectors: selectCurrentStop, selectRemainingStops, selectStopsRemaining
 
-**Validation:** Store updates correctly when `setRoute()` and `completeCurrentStop()` are called in isolation.
+**Validation:** 23 unit tests covering all actions and selectors.
 
 ---
 

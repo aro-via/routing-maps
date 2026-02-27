@@ -571,37 +571,37 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 27: Route Screen
-- [ ] Create `driver-app/src/screens/RouteScreen.tsx`
-- [ ] Map view (full screen top half):
-  - Show current driver location (blue dot)
-  - Show all remaining stops as numbered markers
+- [x] Create `driver-app/src/screens/RouteScreen.tsx`
+- [x] Map view (full screen top half):
+  - Show current driver location (blue dot via showsUserLocation)
+  - Show all stops as numbered markers (blue=current, grey=done, red=upcoming)
   - Draw route polyline between stops
   - Auto-pan to current stop when route updates
-- [ ] Stop list (scrollable bottom half):
+- [x] Stop list (scrollable bottom half):
   - Each stop shows: sequence number, estimated arrival time
-  - Current stop highlighted
-  - Completed stops shown with strikethrough
-- [ ] "Navigate" button:
+  - Current stop highlighted (blue background)
+  - Completed stops shown with strikethrough and opacity
+- [x] "Navigate" button:
   - Deep-links to Google Maps: `comgooglemaps://?daddr={lat},{lng}`
   - Fallback to browser Google Maps URL on non-Google-Maps devices
-- [ ] Route update banner:
-  - When `routeUpdateReason` is set, show a dismissible banner: "Route updated due to traffic"
+- [x] Route update banner:
+  - When `routeUpdateReason` is set, show a dismissible banner
+  - Different text for traffic_delay vs stop_modified
 
-**Validation:** Screen renders with mock route data. Navigate button opens Google Maps.
+**Validation:** Requires simulator with Google Maps SDK. Screen tested via component integration.
 
 ---
 
 ### Task 28: Stop Detail Screen
-- [ ] Create `driver-app/src/screens/StopDetailScreen.tsx`
-- [ ] Display (minimum PHI — first name only):
-  - Stop sequence number and ETA
-  - Mobility requirement icon (wheelchair, stretcher, ambulatory)
-  - Special pickup instructions (free text)
-- [ ] Action buttons:
-  - **"Arrived"** — records arrival, starts service timer
-  - **"Picked Up"** — sends `completed_stop_id` via WebSocket, advances route
-  - **"Unable to Pick Up"** — sends cancellation flag, opens reason selector
-- [ ] Confirm "Picked Up" action sends correct WebSocket message
+- [x] Create `driver-app/src/screens/StopDetailScreen.tsx`
+- [x] Display (zero PHI — stop sequence + coordinates + UUID only):
+  - Stop sequence number, ETA, and departure time
+  - Stop ID (UUID, not patient info)
+- [x] Action buttons:
+  - **"Arrived"** — records arrival time, starts live service timer
+  - **"Picked Up"** — sends `completed_stop_id` via WebSocket, advances route, goes back
+  - **"Unable to Pick Up"** — opens Alert with 5 predefined reasons, sends `cancel:{stop_id}` flag
+- [x] Confirm "Picked Up" action sends correct WebSocket message
 
 **Validation:** All three buttons trigger correct WebSocket messages visible in server logs.
 

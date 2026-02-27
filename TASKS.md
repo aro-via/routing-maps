@@ -328,11 +328,11 @@ For every task:
 ---
 
 ### Task 15: Smoke Test in Docker
-- [ ] Start full stack: `docker-compose up --build`
-- [ ] Send a test request with 4–5 mock stops
-- [ ] Confirm response includes reordered stops, ETAs, and Maps URL
-- [ ] Confirm Maps URL opens correctly in a browser
-- [ ] Run `docker-compose down`
+- [x] Start full stack: `docker-compose up --build`
+- [x] Send a test request with 4–5 mock stops
+- [x] Confirm response includes reordered stops, ETAs, and Maps URL
+- [x] Confirm Maps URL opens correctly in a browser
+- [x] Run `docker-compose down`
 
 ---
 

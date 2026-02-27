@@ -36,6 +36,7 @@ class DriverState:
 
     Fields that the delay detector reads:
         schedule_delay_minutes        — minutes behind the original schedule
+        remaining_duration            — current predicted remaining route time (minutes)
         original_remaining_duration   — baseline remaining route time (minutes)
         last_reroute_timestamp        — Unix time of last re-route (None = never)
         stops_changed                 — True when dispatcher adds/cancels a stop
@@ -44,7 +45,8 @@ class DriverState:
     current_route: List[Dict[str, Any]] = field(default_factory=list)
     last_gps: Optional[Dict[str, Any]] = field(default=None)   # {lat, lng, timestamp}
     completed_stop_ids: List[str] = field(default_factory=list)
-    original_remaining_duration: float = 0.0   # minutes
+    remaining_duration: float = 0.0            # minutes — updated each GPS cycle
+    original_remaining_duration: float = 0.0   # minutes — set once at route start
     schedule_delay_minutes: float = 0.0
     last_reroute_timestamp: Optional[float] = field(default=None)  # Unix timestamp
     stops_changed: bool = False

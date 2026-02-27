@@ -413,19 +413,19 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 19: Delay Detection Logic
-- [ ] Create `app/workers/delay_detector.py`
-- [ ] Implement `should_reroute(driver_state: DriverState) -> tuple[bool, str]`
+- [x] Create `app/workers/delay_detector.py`
+- [x] Implement `should_reroute(driver_state: DriverState) -> tuple[bool, str]`
   - Rule 1: `schedule_delay_minutes > DELAY_THRESHOLD_MINUTES` → `(True, "traffic_delay")`
   - Rule 2: remaining duration > original × `TRAFFIC_INCREASE_RATIO` → `(True, "traffic_delay")`
   - Rule 3: `stops_changed == True` → `(True, "stop_modified")`
   - Rule 4: cooldown — if last re-route was < `MIN_REROUTE_INTERVAL_SECONDS` ago → `(False, "")`
   - Default → `(False, "")`
-- [ ] Load all thresholds from `settings` (not hardcoded)
-- [ ] Add to `.env.example`:
+- [x] Load all thresholds from `settings` (not hardcoded)
+- [x] Add to `.env.example`:
   - `DELAY_THRESHOLD_MINUTES=5`
   - `TRAFFIC_INCREASE_RATIO=1.20`
   - `MIN_REROUTE_INTERVAL_SECONDS=300`
-- [ ] Write `tests/test_delay_detector.py`:
+- [x] Write `tests/test_delay_detector.py`:
   - Test each rule triggers independently
   - Test cooldown prevents back-to-back re-routing
   - Test no false positives on normal on-time driver
@@ -435,8 +435,8 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ---
 
 ### Task 20: Celery Re-Routing Task
-- [ ] Create `app/workers/tasks.py`
-- [ ] Implement `@celery_app.task process_gps_update(driver_id, lat, lng, timestamp, completed_stop_id=None)`:
+- [x] Create `app/workers/tasks.py`
+- [x] Implement `@celery_app.task process_gps_update(driver_id, lat, lng, timestamp, completed_stop_id=None)`:
   - Load driver state from Redis
   - Update GPS in driver state
   - Mark stop completed if `completed_stop_id` provided
@@ -446,7 +446,7 @@ When all checkboxes above (Tasks 1–15) are ticked:
   - Publish new route to Redis Pub/Sub channel `reroute:{driver_id}`
   - Update `last_reroute_timestamp`
   - Log the re-routing event (no PHI in log)
-- [ ] Write `tests/test_tasks.py` with mocked Redis and optimizer:
+- [x] Write `tests/test_tasks.py` with mocked Redis and optimizer:
   - Test GPS update stored correctly
   - Test re-routing triggered when delay detected
   - Test re-routing NOT triggered when on schedule

@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 
 from app.models.schemas import Location, OptimizedStop, OptimizeRouteResponse, Stop
-from app.utils.time_utils import add_minutes_to_time, minutes_to_time_str, time_str_to_minutes
+from app.utils.time_utils import minutes_to_time_str
 
 logger = logging.getLogger(__name__)
 

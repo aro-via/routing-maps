@@ -39,6 +39,7 @@ settings = Settings()
 
 
 def configure_logging() -> None:
+    """Configure root logger level and format from settings."""
     level = getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO)
     logging.basicConfig(
         level=level,

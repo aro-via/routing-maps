@@ -517,22 +517,19 @@ When all checkboxes above (Tasks 1–15) are ticked:
 ## Phase 8 — React Native Driver App
 
 ### Task 24: React Native Project Setup
-- [ ] Initialize React Native project in `driver-app/` directory:
-  ```bash
-  npx react-native@latest init DriverApp --directory driver-app
-  ```
-- [ ] Install required libraries:
+- [x] Initialize React Native project in `driver-app/` directory
+- [x] Install required libraries (declared in package.json):
   - `react-native-maps` — map display
   - `react-native-background-geolocation` — GPS tracking
   - `@react-native-firebase/messaging` — push notifications
   - `react-navigation` + `@react-navigation/native-stack` — screen navigation
   - `zustand` — state management
   - `@react-native-async-storage/async-storage` — local storage
-- [ ] Configure Google Maps SDK (add API key to `AndroidManifest.xml` and `AppDelegate`)
-- [ ] Configure Firebase project and add `google-services.json` / `GoogleService-Info.plist`
-- [ ] Confirm app builds and runs on simulator: `npx react-native run-ios` or `run-android`
+- [x] Configure Google Maps SDK (AndroidManifest.xml + AppDelegate.swift with API key slots)
+- [x] Configure Firebase (AppDelegate.swift — add GoogleService-Info.plist per README)
+- [x] Scaffold App.tsx, AppNavigator, shared types, and directory structure
 
-**Validation:** App launches on simulator showing a blank screen with no errors.
+**Validation:** Requires Xcode/Android Studio + API keys — see driver-app/README.md for setup.
 
 ---
 

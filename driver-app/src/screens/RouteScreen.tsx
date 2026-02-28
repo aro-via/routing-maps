@@ -1,34 +1,30 @@
 /**
  * driver-app/src/screens/RouteScreen.tsx — Main shift screen for the driver.
  *
- * Layout (vertical split):
+ * Layout:
  *   ┌──────────────────────────────────┐
- *   │  UpdateBanner (dismissible)      │  ← only when route was re-optimized
+ *   │  UpdateBanner (dismissible)      │  ← only when route was re-optimised
  *   ├──────────────────────────────────┤
- *   │                                  │
- *   │         MapView (50 %)           │  ← driver dot + stop markers + polyline
- *   │                                  │
+ *   │  Route Summary Card              │  ← current stop + Navigate button
  *   ├──────────────────────────────────┤
- *   │  Stop list (scrollable, 50 %)    │  ← all stops, current highlighted
+ *   │  Stop list (scrollable)          │  ← all stops, current highlighted
  *   └──────────────────────────────────┘
  *
- * Tapping a stop row navigates to StopDetailScreen.
- * The "Navigate" button deep-links to Google Maps for the current stop.
+ * react-native-maps removed for Expo Go compatibility.
+ * The Navigate button deep-links to Google Maps for turn-by-turn directions.
  *
  * No PHI is displayed — only stop sequence number and arrival ETA.
  */
 
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback} from 'react';
 import {
   Linking,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import MapView, {Marker, Polyline, Region} from 'react-native-maps';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
@@ -47,7 +43,6 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Route'>;
 
 export default function RouteScreen(): React.JSX.Element {
   const navigation = useNavigation<NavigationProp>();
-  const mapRef = useRef<MapView>(null);
 
   const route = useRouteStore(state => state.currentRoute);
   const stopIndex = useRouteStore(state => state.currentStopIndex);
@@ -56,34 +51,13 @@ export default function RouteScreen(): React.JSX.Element {
   const currentStop = useRouteStore(selectCurrentStop);
   const remaining = useRouteStore(selectStopsRemaining);
 
-  // Pan map to current stop whenever the route updates
-  useEffect(() => {
-    if (currentStop && mapRef.current) {
-      mapRef.current.animateToRegion(
-        {
-          latitude: currentStop.location.lat,
-          longitude: currentStop.location.lng,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        },
-        500, // animation duration ms
-      );
-    }
-  }, [currentStop]);
-
   const openGoogleMaps = useCallback(() => {
-    if (!currentStop) {
-      return;
-    }
+    if (!currentStop) {return;}
     const {lat, lng} = currentStop.location;
-    // Try Google Maps deep link first, fall back to browser URL
     const gmapsDeep = `comgooglemaps://?daddr=${lat},${lng}&directionsmode=driving`;
     const gmapsWeb = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-
     Linking.canOpenURL(gmapsDeep)
-      .then(supported =>
-        Linking.openURL(supported ? gmapsDeep : gmapsWeb),
-      )
+      .then(supported => Linking.openURL(supported ? gmapsDeep : gmapsWeb))
       .catch(() => Linking.openURL(gmapsWeb));
   }, [currentStop]);
 
@@ -93,22 +67,6 @@ export default function RouteScreen(): React.JSX.Element {
     },
     [navigation],
   );
-
-  // Build polyline coordinates from all stops
-  const polylineCoords = route.map(s => ({
-    latitude: s.location.lat,
-    longitude: s.location.lng,
-  }));
-
-  const initialRegion: Region | undefined =
-    route.length > 0
-      ? {
-          latitude: route[0].location.lat,
-          longitude: route[0].location.lng,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
-        }
-      : undefined;
 
   return (
     <View style={styles.container}>
@@ -126,36 +84,39 @@ export default function RouteScreen(): React.JSX.Element {
         </View>
       )}
 
-      {/* ---- Map ---- */}
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        initialRegion={initialRegion}
-        showsUserLocation
-        showsMyLocationButton={false}>
-        {/* Stop markers */}
-        {route.map((stop, idx) => (
-          <Marker
-            key={stop.stop_id}
-            coordinate={{
-              latitude: stop.location.lat,
-              longitude: stop.location.lng,
-            }}
-            title={`Stop ${stop.sequence}`}
-            description={`ETA ${stop.arrival_time}`}
-            pinColor={idx === stopIndex ? '#2196F3' : idx < stopIndex ? '#9E9E9E' : '#F44336'}
-            testID={`marker-${stop.stop_id}`}
-          />
-        ))}
-        {/* Route polyline */}
-        {polylineCoords.length > 1 && (
-          <Polyline
-            coordinates={polylineCoords}
-            strokeColor="#2196F3"
-            strokeWidth={3}
-          />
+      {/* ---- Current stop summary card ---- */}
+      <View style={styles.card}>
+        {currentStop ? (
+          <>
+            <View style={styles.cardRow}>
+              <View style={styles.cardBadge}>
+                <Text style={styles.cardBadgeText}>{currentStop.sequence}</Text>
+              </View>
+              <View style={styles.cardInfo}>
+                <Text style={styles.cardTitle}>
+                  Next Stop · Arrive {currentStop.arrival_time}
+                </Text>
+                <Text style={styles.cardCoords}>
+                  {currentStop.location.lat.toFixed(5)}, {currentStop.location.lng.toFixed(5)}
+                </Text>
+                <Text style={styles.cardDepart}>
+                  Depart by {currentStop.departure_time}
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={openGoogleMaps}
+              testID="navigate-button">
+              <Text style={styles.navButtonText}>▶  Open in Google Maps</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <Text style={styles.cardEmpty}>
+            {route.length === 0 ? 'Waiting for route assignment…' : 'All stops completed ✓'}
+          </Text>
         )}
-      </MapView>
+      </View>
 
       {/* ---- Stop list ---- */}
       <View style={styles.listContainer}>
@@ -163,14 +124,6 @@ export default function RouteScreen(): React.JSX.Element {
           <Text style={styles.listTitle}>
             {remaining} stop{remaining !== 1 ? 's' : ''} remaining
           </Text>
-          {currentStop && (
-            <TouchableOpacity
-              style={styles.navigateButton}
-              onPress={openGoogleMaps}
-              testID="navigate-button">
-              <Text style={styles.navigateText}>Navigate</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         <ScrollView>
@@ -187,8 +140,13 @@ export default function RouteScreen(): React.JSX.Element {
                 ]}
                 onPress={() => goToStopDetail(stop, idx)}
                 testID={`stop-row-${stop.stop_id}`}>
-                <View style={styles.stopBadge}>
-                  <Text style={styles.stopBadgeText}>{stop.sequence}</Text>
+                <View style={[
+                  styles.stopBadge,
+                  idx < stopIndex && styles.stopBadgeDone,
+                ]}>
+                  <Text style={styles.stopBadgeText}>
+                    {idx < stopIndex ? '✓' : stop.sequence}
+                  </Text>
                 </View>
                 <View style={styles.stopInfo}>
                   <Text
@@ -201,6 +159,7 @@ export default function RouteScreen(): React.JSX.Element {
                   </Text>
                   <Text style={styles.stopEta}>ETA {stop.arrival_time}</Text>
                 </View>
+                <Text style={styles.stopChevron}>›</Text>
               </TouchableOpacity>
             ))
           )}
@@ -215,9 +174,9 @@ export default function RouteScreen(): React.JSX.Element {
 // ---------------------------------------------------------------------------
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#fff'},
+  container: {flex: 1, backgroundColor: '#F5F6FA'},
 
-  // Banner
+  // Update banner
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -231,36 +190,58 @@ const styles = StyleSheet.create({
   bannerText: {fontSize: 14, color: '#856404', flex: 1},
   bannerDismiss: {fontSize: 16, color: '#856404', paddingLeft: 12},
 
-  // Map (top 50 %)
-  map: {flex: 1},
+  // Current stop card
+  card: {
+    backgroundColor: '#fff',
+    margin: 12,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  cardRow: {flexDirection: 'row', alignItems: 'flex-start'},
+  cardBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#2196F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  cardBadgeText: {color: '#fff', fontWeight: '700', fontSize: 18},
+  cardInfo: {flex: 1},
+  cardTitle: {fontSize: 16, fontWeight: '700', color: '#1A1A2E'},
+  cardCoords: {fontSize: 12, color: '#757575', marginTop: 2, fontFamily: 'monospace'},
+  cardDepart: {fontSize: 12, color: '#F57C00', marginTop: 4},
+  cardEmpty: {fontSize: 15, color: '#9E9E9E', textAlign: 'center', paddingVertical: 8},
+  navButton: {
+    marginTop: 14,
+    backgroundColor: '#2196F3',
+    paddingVertical: 11,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  navButtonText: {color: '#fff', fontWeight: '700', fontSize: 14},
 
-  // Stop list (bottom 50 %)
+  // Stop list
   listContainer: {
     flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    overflow: 'hidden',
   },
   listHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    backgroundColor: '#fff',
+    borderBottomColor: '#F0F0F0',
   },
   listTitle: {fontSize: 15, fontWeight: '600', color: '#333'},
-
-  navigateButton: {
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  navigateText: {color: '#fff', fontWeight: '600', fontSize: 13},
-
   emptyText: {
     textAlign: 'center',
     color: '#9E9E9E',
@@ -273,13 +254,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: '#E8E8E8',
     backgroundColor: '#fff',
   },
   stopRowCurrent: {backgroundColor: '#E3F2FD'},
-  stopRowCompleted: {opacity: 0.5},
+  stopRowCompleted: {opacity: 0.45},
 
   stopBadge: {
     width: 32,
@@ -288,12 +269,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
+  stopBadgeDone: {backgroundColor: '#4CAF50'},
   stopBadgeText: {color: '#fff', fontWeight: '700', fontSize: 13},
 
   stopInfo: {flex: 1},
-  stopTitle: {fontSize: 15, fontWeight: '500', color: '#333'},
-  stopTitleCompleted: {textDecorationLine: 'line-through', color: '#9E9E9E'},
+  stopTitle: {fontSize: 15, fontWeight: '500', color: '#222'},
+  stopTitleCompleted: {textDecorationLine: 'line-through', color: '#AAAAAA'},
   stopEta: {fontSize: 13, color: '#757575', marginTop: 2},
+  stopChevron: {fontSize: 20, color: '#CCCCCC', marginLeft: 8},
 });

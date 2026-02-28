@@ -34,17 +34,17 @@ trap cleanup EXIT
 # 1. Generate a fresh RN project in a temp location
 echo "[1/5] Generating RN $RN_VERSION template..."
 cd "$TMP_DIR"
-npx @react-native-community/cli@14 init "$APP_NAME" \
+npx @react-native-community/cli@15 init "$APP_NAME" \
   --version "$RN_VERSION" \
   --skip-install \
   --skip-git-init \
   --pm npm
 
 echo "[2/5] Copying Android build infrastructure..."
-# Copy gradle wrapper + top-level build files (do NOT overwrite AndroidManifest.xml)
+# Copy gradle wrapper + top-level build files
+# Do NOT overwrite AndroidManifest.xml, gradle.properties (we keep newArchEnabled=false)
 cp    "$TMP_DIR/$APP_NAME/android/build.gradle"              "$APP_DIR/android/"
 cp    "$TMP_DIR/$APP_NAME/android/settings.gradle"          "$APP_DIR/android/"
-cp    "$TMP_DIR/$APP_NAME/android/gradle.properties"        "$APP_DIR/android/"
 cp    "$TMP_DIR/$APP_NAME/android/app/build.gradle"         "$APP_DIR/android/app/"
 cp    "$TMP_DIR/$APP_NAME/android/app/proguard-rules.pro"   "$APP_DIR/android/app/"
 cp -r "$TMP_DIR/$APP_NAME/android/gradle"                   "$APP_DIR/android/"

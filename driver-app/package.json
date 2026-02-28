@@ -38,6 +38,9 @@
     "ts-jest": "^29.2.5",
     "typescript": "5.9.2"
   },
+  "overrides": {
+    "@react-native/codegen": "0.81.5"
+  },
   "jest": {
     "preset": "react-native",
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],

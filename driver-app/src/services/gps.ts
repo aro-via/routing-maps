@@ -1,23 +1,19 @@
 /**
  * driver-app/src/services/gps.ts — Background GPS tracking service.
  *
- * Wraps react-native-background-geolocation to provide:
+ * Uses expo-location (Expo Go compatible) to provide:
  *   - Start/stop tracking with a single call
  *   - Adaptive update intervals based on driver speed (ARCHITECTURE.md §10.7):
  *       speed < 5 km/h (stationary)  → 60 s interval
  *       normal driving               → 15 s interval
  *       approaching stop  (< 500 m)  → 5 s interval
- *       (speed-based heuristic — stop proximity requires stop list from store)
  *   - Callback fires with { lat, lng, timestamp, speed } on each fix
  *
  * No PHI passes through this module.  Location data is sent to the server
  * as raw coordinates only.
  */
 
-import BackgroundGeolocation, {
-  Location as BGLocation,
-  State as BGState,
-} from 'react-native-background-geolocation';
+import * as Location from 'expo-location';
 
 export interface GpsLocation {
   lat: number;
@@ -33,7 +29,6 @@ export type GpsCallback = (location: GpsLocation) => void;
 // ---------------------------------------------------------------------------
 
 const SPEED_STATIONARY_KMH = 5;
-const SPEED_TO_MS = 1 / 3.6; // km/h → m/s
 
 const INTERVAL_STATIONARY_MS = 60_000;
 const INTERVAL_NORMAL_MS = 15_000;
@@ -48,30 +43,8 @@ export const APPROACHING_DISTANCE_M = 500;
 
 class GpsService {
   private _callback: GpsCallback | null = null;
-  private _configured = false;
-
-  /**
-   * Start background GPS tracking.  The callback is called on every fix.
-   *
-   * Safe to call multiple times — subsequent calls update the callback and
-   * re-start if the service was stopped.
-   */
-  async start(callback: GpsCallback): Promise<void> {
-    this._callback = callback;
-
-    if (!this._configured) {
-      await this._configure();
-      this._configured = true;
-    }
-
-    await BackgroundGeolocation.start();
-  }
-
-  /** Stop GPS tracking and release the callback. */
-  async stop(): Promise<void> {
-    this._callback = null;
-    await BackgroundGeolocation.stop();
-  }
+  private _subscription: Location.LocationSubscription | null = null;
+  private _timeIntervalMs = INTERVAL_NORMAL_MS;
 
   /**
    * Compute the desired location interval based on current speed.
@@ -89,64 +62,67 @@ class GpsService {
     return INTERVAL_NORMAL_MS;
   }
 
-  // ---------------------------------------------------------------------------
-  // Private
-  // ---------------------------------------------------------------------------
+  /**
+   * Start GPS tracking.  The callback is called on every fix.
+   *
+   * Requests foreground location permission before starting.
+   * Safe to call multiple times — subsequent calls update the callback.
+   */
+  async start(callback: GpsCallback): Promise<void> {
+    this._callback = callback;
+    await this._subscribe();
+  }
 
-  private async _configure(): Promise<BGState> {
-    // Event listener — fired on every location fix
-    BackgroundGeolocation.onLocation(
-      (location: BGLocation) => {
-        if (this._callback) {
-          this._callback({
-            lat: location.coords.latitude,
-            lng: location.coords.longitude,
-            timestamp: location.timestamp,
-            speed: location.coords.speed ?? -1,
-          });
-        }
-      },
-      (error: number) => {
-        // Location error (permissions denied, GPS off, etc.) — log only
-        console.warn('[GpsService] location error code:', error);
-      },
-    );
-
-    return BackgroundGeolocation.ready({
-      // --- Accuracy ---
-      desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-      distanceFilter: 10, // metres — minimum movement to fire an update
-
-      // --- Battery / intervals (overridden adaptively at runtime) ---
-      locationUpdateInterval: INTERVAL_NORMAL_MS,
-      fastestLocationUpdateInterval: INTERVAL_APPROACHING_MS,
-
-      // --- Background behaviour ---
-      stopOnTerminate: false,
-      startOnBoot: true,
-      foregroundService: true, // Android: keeps tracking when app is backgrounded
-      notification: {
-        title: 'NEMT Driver App',
-        text: 'GPS tracking active',
-        smallIcon: 'mipmap/ic_launcher',
-      },
-
-      // --- Debug (disable in production) ---
-      debug: false,
-      logLevel: BackgroundGeolocation.LOG_LEVEL_WARNING,
-    });
+  /** Stop GPS tracking and release the callback. */
+  async stop(): Promise<void> {
+    this._subscription?.remove();
+    this._subscription = null;
+    this._callback = null;
   }
 
   /**
    * Dynamically update the location interval — called after each fix
    * when stop-proximity information is available from the route store.
+   * Re-creates the watcher only when the interval actually changes.
    */
   async updateInterval(speedMs: number, nearestStopDistM?: number): Promise<void> {
     const interval = this.adaptiveIntervalMs(speedMs, nearestStopDistM);
-    await BackgroundGeolocation.setConfig({
-      locationUpdateInterval: interval,
-      fastestLocationUpdateInterval: Math.min(interval, INTERVAL_APPROACHING_MS),
-    });
+    if (interval !== this._timeIntervalMs && this._callback) {
+      this._timeIntervalMs = interval;
+      this._subscription?.remove();
+      this._subscription = null;
+      await this._subscribe();
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Private
+  // ---------------------------------------------------------------------------
+
+  private async _subscribe(): Promise<void> {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.warn('[GpsService] location permission denied');
+      return;
+    }
+
+    this._subscription = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        distanceInterval: 10,       // metres — minimum movement between updates
+        timeInterval: this._timeIntervalMs,
+      },
+      (loc) => {
+        if (this._callback) {
+          this._callback({
+            lat: loc.coords.latitude,
+            lng: loc.coords.longitude,
+            timestamp: new Date(loc.timestamp).toISOString(),
+            speed: loc.coords.speed ?? -1,
+          });
+        }
+      },
+    );
   }
 }
 

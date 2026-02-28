@@ -1,24 +1,20 @@
 /**
  * Tests for GPS service adaptive interval logic.
  *
- * The underlying react-native-background-geolocation library is mocked so
- * these tests run in a plain Node environment with no native modules.
+ * expo-location is mocked so these tests run in a plain Node environment
+ * with no native modules.
  */
 
 import {gpsService, APPROACHING_DISTANCE_M} from '../services/gps';
 
 // ---------------------------------------------------------------------------
-// Mock react-native-background-geolocation
+// Mock expo-location
 // ---------------------------------------------------------------------------
 
-jest.mock('react-native-background-geolocation', () => ({
-  DESIRED_ACCURACY_HIGH: 0,
-  LOG_LEVEL_WARNING: 1,
-  onLocation: jest.fn(),
-  ready: jest.fn().mockResolvedValue({}),
-  start: jest.fn().mockResolvedValue({}),
-  stop: jest.fn().mockResolvedValue({}),
-  setConfig: jest.fn().mockResolvedValue({}),
+jest.mock('expo-location', () => ({
+  Accuracy: {High: 6},
+  requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({status: 'granted'}),
+  watchPositionAsync: jest.fn().mockResolvedValue({remove: jest.fn()}),
 }));
 
 // ---------------------------------------------------------------------------

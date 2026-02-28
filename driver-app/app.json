@@ -4,6 +4,13 @@
     "slug": "driver-app",
     "version": "1.0.0",
     "platforms": ["ios", "android"],
-    "plugins": []
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow NEMT Driver to use your location for route guidance."
+        }
+      ]
+    ]
   }
 }

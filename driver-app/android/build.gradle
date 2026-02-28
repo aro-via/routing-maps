@@ -19,3 +19,14 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// react-native-maps declares 'com.facebook.react:react-native' (old artifact name).
+// RN 0.76 renamed it to 'com.facebook.react:react-android'.
+// Substitute globally so ViewManagerWithGeneratedInterface is found at compile time.
+allprojects {
+    configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            substitute module("com.facebook.react:react-native") using module("com.facebook.react:react-android")
+        }
+    }
+}

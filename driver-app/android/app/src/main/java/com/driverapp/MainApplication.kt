@@ -21,9 +21,9 @@ class MainApplication : Application(), ReactApplication {
 
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
-        // Hardcoded false — new arch libs are not bundled in this build
+        // New arch and Hermes disabled for maximum compatibility
         override val isNewArchEnabled: Boolean = false
-        override val isHermesEnabled: Boolean = true
+        override val isHermesEnabled: Boolean = false
       }
 
   override val reactHost: ReactHost

@@ -4,8 +4,6 @@
     "slug": "driver-app",
     "version": "1.0.0",
     "platforms": ["ios", "android"],
-    "plugins": [
-      "@react-native-firebase/app"
-    ]
+    "plugins": []
   }
 }

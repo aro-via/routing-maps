@@ -1,38 +1,28 @@
-/**
- * AppDelegate.swift — iOS entry point for the NEMT Driver App.
- *
- * Configures:
- *   - Google Maps SDK (API key loaded from Info.plist)
- *   - Firebase (FCM push notifications)
- *   - React Native bridge
- *
- * SETUP:
- *   1. Add your Google Maps API key to Info.plist under GMSApiKey.
- *   2. Download GoogleService-Info.plist from Firebase Console and place it
- *      in the ios/ directory (do NOT commit this file — add to .gitignore).
- */
 import UIKit
-import GoogleMaps
-import FirebaseCore
+import React
+import React_RCTAppDelegate
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: RCTAppDelegate {
 
-  var window: UIWindow?
-
-  func application(
+  override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    self.moduleName = "DriverApp"
+    self.initialProps = [:]
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
 
-    // Google Maps SDK — key stored in Info.plist (never hardcoded)
-    if let mapsApiKey = Bundle.main.object(forInfoDictionaryKey: "GMSApiKey") as? String {
-      GMSServices.provideAPIKey(mapsApiKey)
-    }
+  override func sourceURL(for bridge: RCTBridge) -> URL? {
+    self.bundleURL()
+  }
 
-    // Firebase (FCM push notifications)
-    FirebaseApp.configure()
-
-    return true
+  override func bundleURL() -> URL? {
+#if DEBUG
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+#endif
   }
 }

@@ -4,6 +4,7 @@
     "slug": "driver-app",
     "version": "1.0.0",
     "platforms": ["ios", "android"],
+    "newArchEnabled": false,
     "plugins": [
       [
         "expo-location",

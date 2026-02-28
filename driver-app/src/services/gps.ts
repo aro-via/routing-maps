@@ -1,7 +1,7 @@
 /**
  * driver-app/src/services/gps.ts — Background GPS tracking service.
  *
- * Uses expo-location (Expo Go compatible) to provide:
+ * Uses react-native-geolocation-service to provide:
  *   - Start/stop tracking with a single call
  *   - Adaptive update intervals based on driver speed (ARCHITECTURE.md §10.7):
  *       speed < 5 km/h (stationary)  → 60 s interval
@@ -13,7 +13,8 @@
  * as raw coordinates only.
  */
 
-import * as Location from 'expo-location';
+import Geolocation from 'react-native-geolocation-service';
+import {Platform, PermissionsAndroid} from 'react-native';
 
 export interface GpsLocation {
   lat: number;
@@ -43,7 +44,7 @@ export const APPROACHING_DISTANCE_M = 500;
 
 class GpsService {
   private _callback: GpsCallback | null = null;
-  private _subscription: Location.LocationSubscription | null = null;
+  private _watchId: number | null = null;
   private _timeIntervalMs = INTERVAL_NORMAL_MS;
 
   /**
@@ -65,7 +66,7 @@ class GpsService {
   /**
    * Start GPS tracking.  The callback is called on every fix.
    *
-   * Requests foreground location permission before starting.
+   * Requests location permission before starting.
    * Safe to call multiple times — subsequent calls update the callback.
    */
   async start(callback: GpsCallback): Promise<void> {
@@ -75,8 +76,10 @@ class GpsService {
 
   /** Stop GPS tracking and release the callback. */
   async stop(): Promise<void> {
-    this._subscription?.remove();
-    this._subscription = null;
+    if (this._watchId !== null) {
+      Geolocation.clearWatch(this._watchId);
+      this._watchId = null;
+    }
     this._callback = null;
   }
 
@@ -89,8 +92,10 @@ class GpsService {
     const interval = this.adaptiveIntervalMs(speedMs, nearestStopDistM);
     if (interval !== this._timeIntervalMs && this._callback) {
       this._timeIntervalMs = interval;
-      this._subscription?.remove();
-      this._subscription = null;
+      if (this._watchId !== null) {
+        Geolocation.clearWatch(this._watchId);
+        this._watchId = null;
+      }
       await this._subscribe();
     }
   }
@@ -99,28 +104,55 @@ class GpsService {
   // Private
   // ---------------------------------------------------------------------------
 
+  private async _requestPermission(): Promise<boolean> {
+    if (Platform.OS === 'ios') {
+      const result = await Geolocation.requestAuthorization('whenInUse');
+      return result === 'granted';
+    }
+    if (Platform.OS === 'android') {
+      const result = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Permission',
+          message: 'NEMT Driver needs your location for route guidance.',
+          buttonPositive: 'Grant',
+        },
+      );
+      return result === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return false;
+  }
+
   private async _subscribe(): Promise<void> {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
+    const hasPermission = await this._requestPermission();
+    if (!hasPermission) {
       console.warn('[GpsService] location permission denied');
       return;
     }
 
-    this._subscription = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        distanceInterval: 10,       // metres — minimum movement between updates
-        timeInterval: this._timeIntervalMs,
-      },
-      (loc) => {
+    this._watchId = Geolocation.watchPosition(
+      pos => {
         if (this._callback) {
           this._callback({
-            lat: loc.coords.latitude,
-            lng: loc.coords.longitude,
-            timestamp: new Date(loc.timestamp).toISOString(),
-            speed: loc.coords.speed ?? -1,
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            timestamp: new Date(pos.timestamp).toISOString(),
+            speed: pos.coords.speed ?? -1,
           });
         }
+      },
+      err => {
+        console.warn('[GpsService] watchPosition error:', err.message);
+      },
+      {
+        enableHighAccuracy: true,
+        distanceFilter: 10,
+        interval: this._timeIntervalMs,
+        fastestInterval: this._timeIntervalMs,
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
       },
     );
   }

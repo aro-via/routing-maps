@@ -20,6 +20,7 @@
 
 import {create} from 'zustand';
 import {OptimizedStop, DriverStatus, RouteUpdateReason} from '../types';
+import {GpsLocation} from '../services/gps';
 
 // ---------------------------------------------------------------------------
 // State shape
@@ -31,6 +32,7 @@ interface RouteState {
   driverStatus: DriverStatus;
   lastUpdated: string | null;
   routeUpdateReason: RouteUpdateReason | null;
+  driverLocation: GpsLocation | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -62,6 +64,11 @@ interface RouteActions {
    * Dismiss the route update banner (clear routeUpdateReason).
    */
   dismissUpdateBanner: () => void;
+
+  /**
+   * Update the driver's current GPS position (for map display).
+   */
+  setDriverLocation: (loc: GpsLocation) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -74,6 +81,7 @@ const INITIAL_STATE: RouteState = {
   driverStatus: 'idle',
   lastUpdated: null,
   routeUpdateReason: null,
+  driverLocation: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -105,6 +113,8 @@ export const useRouteStore = create<RouteState & RouteActions>(set => ({
   resetRoute: () => set(INITIAL_STATE),
 
   dismissUpdateBanner: () => set({routeUpdateReason: null}),
+
+  setDriverLocation: (loc: GpsLocation) => set({driverLocation: loc}),
 }));
 
 // ---------------------------------------------------------------------------

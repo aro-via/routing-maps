@@ -21,9 +21,8 @@ class MainApplication : Application(), ReactApplication {
 
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
-        // New arch and Hermes disabled for maximum compatibility
         override val isNewArchEnabled: Boolean = false
-        override val isHermesEnabled: Boolean = false
+        override val isHermesEnabled: Boolean = true
       }
 
   override val reactHost: ReactHost
@@ -32,6 +31,5 @@ class MainApplication : Application(), ReactApplication {
   override fun onCreate() {
     super.onCreate()
     SoLoader.init(this, false)
-    // Do NOT call DefaultNewArchitectureEntryPoint.load() — new arch is disabled
   }
 }

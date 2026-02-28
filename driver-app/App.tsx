@@ -21,6 +21,7 @@ const SERVER_URL = 'ws://localhost:8000';
 
 export default function App(): React.JSX.Element {
   const setRoute = useRouteStore(state => state.setRoute);
+  const setDriverLocation = useRouteStore(state => state.setDriverLocation);
 
   useEffect(() => {
     // Connect WebSocket and wire route updates into the store
@@ -28,8 +29,11 @@ export default function App(): React.JSX.Element {
       onRouteUpdated: stops => setRoute(stops),
     });
 
-    // Start background GPS — each fix is forwarded to the WS client
-    gpsService.start(location => wsClient.sendGpsUpdate(location));
+    // Start background GPS — each fix is forwarded to the WS client and map store
+    gpsService.start(location => {
+      wsClient.sendGpsUpdate(location);
+      setDriverLocation(location);
+    });
 
     return () => {
       gpsService.stop();

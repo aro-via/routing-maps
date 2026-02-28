@@ -7,11 +7,10 @@
  *   ├──────────────────────────────────┤
  *   │  Route Summary Card              │  ← current stop + Navigate button
  *   ├──────────────────────────────────┤
- *   │  Stop list (scrollable)          │  ← all stops, current highlighted
+ *   │  [Map Tab] or [List Tab]         │  ← switchable via tab bar
+ *   ├──────────────────────────────────┤
+ *   │  TabBar — 🗺 Map  |  ☰ List     │
  *   └──────────────────────────────────┘
- *
- * react-native-maps removed for Expo Go compatibility.
- * The Navigate button deep-links to Google Maps for turn-by-turn directions.
  *
  * No PHI is displayed — only stop sequence number and arrival ETA.
  */
@@ -25,6 +24,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import {useNavigation} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
@@ -50,6 +50,9 @@ export default function RouteScreen(): React.JSX.Element {
   const dismissBanner = useRouteStore(state => state.dismissUpdateBanner);
   const currentStop = useRouteStore(selectCurrentStop);
   const remaining = useRouteStore(selectStopsRemaining);
+  const driverLocation = useRouteStore(state => state.driverLocation);
+
+  const [activeTab, setActiveTab] = React.useState<'map' | 'list'>('map');
 
   const openGoogleMaps = useCallback(() => {
     if (!currentStop) {return;}
@@ -67,6 +70,38 @@ export default function RouteScreen(): React.JSX.Element {
     },
     [navigation],
   );
+
+  // Initial map region: driver location → first stop → Sydney fallback
+  const initialRegion = React.useMemo(() => {
+    if (driverLocation) {
+      return {
+        latitude: driverLocation.lat,
+        longitude: driverLocation.lng,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      };
+    }
+    if (route.length > 0) {
+      return {
+        latitude: route[0].location.lat,
+        longitude: route[0].location.lng,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      };
+    }
+    return {
+      latitude: -33.8688,
+      longitude: 151.2093,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const markerColor = (idx: number): string => {
+    if (idx < stopIndex) {return '#4CAF50';} // completed — green
+    if (idx === stopIndex) {return '#2196F3';} // current — blue
+    return '#9E9E9E'; // upcoming — grey
+  };
 
   return (
     <View style={styles.container}>
@@ -118,52 +153,112 @@ export default function RouteScreen(): React.JSX.Element {
         )}
       </View>
 
-      {/* ---- Stop list ---- */}
-      <View style={styles.listContainer}>
-        <View style={styles.listHeader}>
-          <Text style={styles.listTitle}>
-            {remaining} stop{remaining !== 1 ? 's' : ''} remaining
-          </Text>
-        </View>
-
-        <ScrollView>
-          {route.length === 0 ? (
-            <Text style={styles.emptyText}>No stops assigned yet.</Text>
-          ) : (
-            route.map((stop, idx) => (
-              <TouchableOpacity
+      {/* ---- Map or List tab content ---- */}
+      <View style={styles.tabContent}>
+        {activeTab === 'map' ? (
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={styles.map}
+            initialRegion={initialRegion}
+            showsUserLocation={false}
+            testID="map-view">
+            {/* Driver location marker */}
+            {driverLocation && (
+              <Marker
+                coordinate={{
+                  latitude: driverLocation.lat,
+                  longitude: driverLocation.lng,
+                }}
+                pinColor="#1565C0"
+                title="You"
+                testID="driver-marker"
+              />
+            )}
+            {/* Stop markers */}
+            {route.map((stop, idx) => (
+              <Marker
                 key={stop.stop_id}
-                style={[
-                  styles.stopRow,
-                  idx === stopIndex && styles.stopRowCurrent,
-                  idx < stopIndex && styles.stopRowCompleted,
-                ]}
+                coordinate={{
+                  latitude: stop.location.lat,
+                  longitude: stop.location.lng,
+                }}
+                pinColor={markerColor(idx)}
+                title={`Stop ${stop.sequence}`}
                 onPress={() => goToStopDetail(stop, idx)}
-                testID={`stop-row-${stop.stop_id}`}>
-                <View style={[
-                  styles.stopBadge,
-                  idx < stopIndex && styles.stopBadgeDone,
-                ]}>
-                  <Text style={styles.stopBadgeText}>
-                    {idx < stopIndex ? '✓' : stop.sequence}
-                  </Text>
-                </View>
-                <View style={styles.stopInfo}>
-                  <Text
+                testID={`stop-marker-${stop.stop_id}`}
+              />
+            ))}
+          </MapView>
+        ) : (
+          /* ---- List tab ---- */
+          <View style={styles.listContainer}>
+            <View style={styles.listHeader}>
+              <Text style={styles.listTitle}>
+                {remaining} stop{remaining !== 1 ? 's' : ''} remaining
+              </Text>
+            </View>
+            <ScrollView>
+              {route.length === 0 ? (
+                <Text style={styles.emptyText}>No stops assigned yet.</Text>
+              ) : (
+                route.map((stop, idx) => (
+                  <TouchableOpacity
+                    key={stop.stop_id}
                     style={[
-                      styles.stopTitle,
-                      idx < stopIndex && styles.stopTitleCompleted,
+                      styles.stopRow,
+                      idx === stopIndex && styles.stopRowCurrent,
+                      idx < stopIndex && styles.stopRowCompleted,
+                    ]}
+                    onPress={() => goToStopDetail(stop, idx)}
+                    testID={`stop-row-${stop.stop_id}`}>
+                    <View style={[
+                      styles.stopBadge,
+                      idx < stopIndex && styles.stopBadgeDone,
                     ]}>
-                    Stop {stop.sequence}
-                    {idx === stopIndex ? '  ← Current' : ''}
-                  </Text>
-                  <Text style={styles.stopEta}>ETA {stop.arrival_time}</Text>
-                </View>
-                <Text style={styles.stopChevron}>›</Text>
-              </TouchableOpacity>
-            ))
-          )}
-        </ScrollView>
+                      <Text style={styles.stopBadgeText}>
+                        {idx < stopIndex ? '✓' : stop.sequence}
+                      </Text>
+                    </View>
+                    <View style={styles.stopInfo}>
+                      <Text
+                        style={[
+                          styles.stopTitle,
+                          idx < stopIndex && styles.stopTitleCompleted,
+                        ]}>
+                        Stop {stop.sequence}
+                        {idx === stopIndex ? '  ← Current' : ''}
+                      </Text>
+                      <Text style={styles.stopEta}>ETA {stop.arrival_time}</Text>
+                    </View>
+                    <Text style={styles.stopChevron}>›</Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </ScrollView>
+          </View>
+        )}
+      </View>
+
+      {/* ---- Tab bar ---- */}
+      <View style={styles.tabBar}>
+        <TouchableOpacity
+          style={styles.tabButton}
+          onPress={() => setActiveTab('map')}
+          testID="tab-map">
+          <Text style={[styles.tabLabel, activeTab === 'map' && styles.tabLabelActive]}>
+            🗺 Map
+          </Text>
+          {activeTab === 'map' && <View style={styles.tabUnderline} />}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tabButton}
+          onPress={() => setActiveTab('list')}
+          testID="tab-list">
+          <Text style={[styles.tabLabel, activeTab === 'list' && styles.tabLabelActive]}>
+            ☰ List
+          </Text>
+          {activeTab === 'list' && <View style={styles.tabUnderline} />}
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -227,6 +322,12 @@ const styles = StyleSheet.create({
   },
   navButtonText: {color: '#fff', fontWeight: '700', fontSize: 14},
 
+  // Tab content area
+  tabContent: {flex: 1},
+
+  // Map
+  map: {flex: 1},
+
   // Stop list
   listContainer: {
     flex: 1,
@@ -279,4 +380,26 @@ const styles = StyleSheet.create({
   stopTitleCompleted: {textDecorationLine: 'line-through', color: '#AAAAAA'},
   stopEta: {fontSize: 13, color: '#757575', marginTop: 2},
   stopChevron: {fontSize: 20, color: '#CCCCCC', marginLeft: 8},
+
+  // Tab bar
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E0E0E0',
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  tabLabel: {fontSize: 15, color: '#9E9E9E', fontWeight: '500'},
+  tabLabelActive: {color: '#2196F3'},
+  tabUnderline: {
+    marginTop: 4,
+    height: 2,
+    width: 40,
+    backgroundColor: '#2196F3',
+    borderRadius: 1,
+  },
 });

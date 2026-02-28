@@ -57,4 +57,10 @@ dependencies {
     // hermes-android: Hermes JS engine + native .so files (libhermes_executor.so etc.)
     // Always include explicitly — do not rely on hermesEnabled conditional
     implementation("com.facebook.react:hermes-android")
+
+    // Autolinked native modules — must match project names from settings.gradle autolinking
+    implementation project(":react-native-screens")
+    implementation project(":react-native-safe-area-context")
+    implementation project(":react-native-geolocation-service")
+    implementation project(":react-native-async-storage_async-storage")
 }

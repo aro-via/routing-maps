@@ -31,3 +31,6 @@ dist/
 # Editor
 .idea/
 .vscode/
+
+# Android local machine config (machine-specific SDK paths)
+android/local.properties
